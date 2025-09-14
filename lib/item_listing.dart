@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ItemListing extends StatefulWidget {
-  ItemListing({
+  const ItemListing({super.key, 
     required this.itemSelectedCallback,
     required this.selectedItem,
   });
@@ -21,8 +21,8 @@ class ItemListingState extends State<ItemListing> {
     required this.selectedItem,
   });
   @override
-  initState() {
-//    await Item.readFromFile().then((value) => setState(() {}));
+  initState() async {
+    await Item.readFromFile().then((value) => setState(() {}));
     super.initState();
   }
 
@@ -34,8 +34,8 @@ class ItemListingState extends State<ItemListing> {
   late void Function(void Function()) _ss;
   Future getContacts() async {
 //    if (await FlutterContacts.requestPermission(readonly: true)) {
-    this.contacts = await FlutterContacts.getContacts(withProperties: true);
-    this._filteredContacts = new List<Contact>.from(contacts);
+    contacts = await FlutterContacts.getContacts(withProperties: true);
+    _filteredContacts = List<Contact>.from(contacts);
 //    }
   }
 
@@ -46,15 +46,12 @@ class ItemListingState extends State<ItemListing> {
           c.displayName.toLowerCase().contains(text.toLowerCase()))
         this._filteredContacts.add(c);
     });
-    print("List size=" + _filteredContacts.length.toString());
+    print("List size=${_filteredContacts.length}");
     _ss(() {});
   }
 
-  void _onClearPressed() {
-    print("search button clicked");
-  }
 
-  final TextEditingController _controller = new TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   Widget setupAlertDialoadContainer(context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -104,9 +101,9 @@ class ItemListingState extends State<ItemListing> {
             child: StatefulBuilder(
               builder: (context, _setState) => ListView.builder(
                 shrinkWrap: true,
-                itemCount: this._filteredContacts.length,
+                itemCount: _filteredContacts.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final contact = this._filteredContacts[index];
+                  final contact = _filteredContacts[index];
                   _ss = _setState;
                   return CheckboxListTile(
                     title: Text(contact.displayName),
@@ -221,7 +218,7 @@ class ItemListingState extends State<ItemListing> {
               builder: (context) {
                 return AlertDialog(
                   scrollable: true,
-                  title: Text('Count=' + this.contacts.length.toString()),
+                  title: Text('Count=${this.contacts.length}'),
                   content: setupAlertDialoadContainer(context),
                   actions: <Widget>[
                     TextButton(
