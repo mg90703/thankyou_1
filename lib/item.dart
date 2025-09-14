@@ -26,29 +26,34 @@ class Item {
   bool completed;
 
   static bool contains(String name) {
-    for (Item i in items) if (i.name == name) return true;
+    for (Item i in items) {
+      if (i.name == name) return true;
+    }
     return false;
   }
 
   static add(Item item) {
-    for (Item i in items) if (i.name == item.name) ;
+    for (Item i in items) {
+      if (i.name == item.name) ;
+    }
     items.add(item);
     writeToFile();
   }
 
-  static remove(String name) {
-    for (Item i in items)
+  static void remove(String name) {
+    for (Item i in items) {
       if (i.name == name) {
         items.remove(i);
       }
+    }
     writeToFile();
   }
 
 // Write data to a file
-  static writeToFile() async {
+  static Future<void> writeToFile() async {
     final file = File(await getFilePath());
     file.writeAsStringSync(''); // blank out the file
-    items.forEach((element) {
+    for (var element in items) {
       Map<String, dynamic> data = {
         'name': element.name,
         'email': element.email,
@@ -57,8 +62,8 @@ class Item {
         'notes': element.notes,
         'completed': element.completed
       };
-      file.writeAsStringSync(jsonEncode(data) + '\n', mode: FileMode.append);
-    });
+      file.writeAsStringSync('${jsonEncode(data)}\n', mode: FileMode.append);
+    }
   }
 
 // Read data from a file
@@ -67,7 +72,7 @@ class Item {
     if (file.existsSync()) {
       items.clear();
       List<String> lines = file.readAsLinesSync();
-      lines.forEach((element) {
+      for (var element in lines) {
         final i = jsonDecode(element);
         items.add(Item(
             name: i['name'],
@@ -76,7 +81,7 @@ class Item {
             picture: i['picture'],
             notes: i['notes'],
             completed: i['completed']));
-      });
+      }
     }
   }
 }

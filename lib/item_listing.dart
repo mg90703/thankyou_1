@@ -33,20 +33,20 @@ class ItemListingState extends State<ItemListing> {
   final Item selectedItem;
   late void Function(void Function()) _ss;
   Future getContacts() async {
-//    if (await FlutterContacts.requestPermission(readonly: true)) {
-    contacts = await FlutterContacts.getContacts(withProperties: true);
-    _filteredContacts = List<Contact>.from(contacts);
-//    }
+ //   if (await FlutterContacts.requestPermission(readonly: true)) {
+      contacts = await FlutterContacts.getContacts(withProperties: true);
+      _filteredContacts = List<Contact>.from(contacts);
+ //   }
   }
 
-  onSearchTextChanged(String text) async {
-    this._filteredContacts.clear();
-    this.contacts.forEach((c) {
+  Future<void> onSearchTextChanged(String text) async {
+    _filteredContacts.clear();
+    for (var c in contacts) {
       if (text.isEmpty ||
-          c.displayName.toLowerCase().contains(text.toLowerCase()))
-        this._filteredContacts.add(c);
-    });
-    print("List size=${_filteredContacts.length}");
+          c.displayName.toLowerCase().contains(text.toLowerCase())) {
+        _filteredContacts.add(c);
+      }
+    }
     _ss(() {});
   }
 
@@ -99,12 +99,12 @@ class ItemListingState extends State<ItemListing> {
             height: 300.0, // Change as per your requirement
             width: 300.0, // Change as per your requirement
             child: StatefulBuilder(
-              builder: (context, _setState) => ListView.builder(
+              builder: (context, setState) => ListView.builder(
                 shrinkWrap: true,
                 itemCount: _filteredContacts.length,
                 itemBuilder: (BuildContext context, int index) {
                   final contact = _filteredContacts[index];
-                  _ss = _setState;
+                  _ss = setState;
                   return CheckboxListTile(
                     title: Text(contact.displayName),
                     value: Item.contains(contact.displayName),
@@ -126,7 +126,7 @@ class ItemListingState extends State<ItemListing> {
                       } else {
                         Item.remove(contact.displayName);
                       }
-                      _setState(() {}); // for the dialog's checkbox
+                      setState(() {}); // for the dialog's checkbox
                       setState(() {}); // for the main list
                     },
                   );
@@ -225,6 +225,7 @@ class ItemListingState extends State<ItemListing> {
                       child: const Text('ok'),
                       onPressed: () {
                         Navigator.of(context).pop();
+                        setState(() {});
                       },
                     ),
                   ],

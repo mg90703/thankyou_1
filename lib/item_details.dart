@@ -13,7 +13,7 @@ const GEMINI_API_KEY="AIzaSyAR422QbUHwHJrNThsfT2bGvdRCBUvK4pY";
 //import 'package:share_plus/share_plus.dart';
 
 class ItemDetails extends StatefulWidget {
-  ItemDetails({
+  const ItemDetails({super.key, 
     required this.isInTabletLayout,
     required this.item,
   });
@@ -50,7 +50,7 @@ class ItemDetailsState extends State<ItemDetails> {
         '<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta></head>';
     html += '<table style="width:75%;margin:auto;">';
     html += '<tr><td><h1>Thank You</h1></td></tr>';
-    html += '<tr><td><p>' + item.notes + '</p></td></tr>';
+    html += '<tr><td><p>${item.notes}</p></td></tr>';
     html += '<tr><td><img width="100%" src="cid:guest@photo"></td></tr>';
     html += "</table>";
     html += '</body></html>';
@@ -97,7 +97,7 @@ class ItemDetailsState extends State<ItemDetails> {
     final smtpServer = SmtpServer('mail.manikrit.com',
         port: 587, username: username, password: password);
     File pic = File(item.picture);
-    Attachment a = new FileAttachment(pic);
+    Attachment a = FileAttachment(pic);
     a.cid = "<guest@photo>";
     a.location = Location.inline;
     String html = "<html><body>";
@@ -105,7 +105,7 @@ class ItemDetailsState extends State<ItemDetails> {
         '<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta></head>';
     html += '<table style="width:75%;margin:auto;">';
 //    html += '<tr><td><h1>Thank You</h1></td></tr>';
-    html += '<tr><td><p>' + item.notes + '</p></td></tr>';
+    html += '<tr><td><p>${item.notes}</p></td></tr>';
     html += '<tr><td><img width="100%" src="cid:guest@photo"></td></tr>';
     html += "</table>";
     html += '</body></html>';
@@ -122,7 +122,7 @@ class ItemDetailsState extends State<ItemDetails> {
     message.attachments.add(a);
     try {
       final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
+      print('Message sent: $sendReport');
       item.completed = true;
     } on MailerException catch (e) {
       print(e.message);
