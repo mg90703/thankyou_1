@@ -33,10 +33,10 @@ class ItemListingState extends State<ItemListing> {
   final Item selectedItem;
   late void Function(void Function()) _ss;
   Future getContacts() async {
- //   if (await FlutterContacts.requestPermission(readonly: true)) {
+//    if (await FlutterContacts.requestPermission(readonly: true)) {
       contacts = await FlutterContacts.getContacts(withProperties: true);
       _filteredContacts = List<Contact>.from(contacts);
- //   }
+//    }
   }
 
   Future<void> onSearchTextChanged(String text) async {
@@ -201,6 +201,12 @@ class ItemListingState extends State<ItemListing> {
                           ),
                 alignment: Alignment.centerRight,
                 onPressed: () {},
+              ),
+              IconButton(
+                iconSize: 30,
+                icon: const Icon(Icons.delete,),
+                alignment: Alignment.centerRight,
+                onPressed: () {Item.remove(item.name);setState(() {});},
               ),
             ])),
             onTap: () {

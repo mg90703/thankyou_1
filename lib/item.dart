@@ -52,6 +52,7 @@ class Item {
     for (Item i in items) {
       if (i.name == name) {
         items.remove(i);
+        break;
       }
     }
     writeToFile();
