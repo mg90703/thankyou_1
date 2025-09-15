@@ -14,13 +14,13 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
   static const int kTabletBreakpoint = 600;
 
   Item _selectedItem = Item(
-      name: "", email: '', phone: '', picture: '', notes: '', completed: false);
+      name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
 
   Widget _buildMobileLayout() {
     return ItemListing(
       selectedItem: _selectedItem,
       itemSelectedCallback: (item) {
-        this.setState(() {});
+        setState(() {});
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -32,7 +32,7 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
             },
           ),
         ).then((_) {
-          this.setState(() {});
+          setState(() {});
         });
       },
     );

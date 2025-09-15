@@ -1,12 +1,15 @@
 import 'item.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:sms_mms/sms_mms.dart';
+
 const GEMINI_API_KEY="AIzaSyAR422QbUHwHJrNThsfT2bGvdRCBUvK4pY";
 
 //import 'package:whatsapp_share/whatsapp_share.dart';
@@ -41,7 +44,25 @@ class ItemDetailsState extends State<ItemDetails> {
     Item item,
   ) async {
     final XFile? pickedFile = await picker.pickImage(source: img);
+    final croppedFile=await(ImageCropper().cropImage(
+                  sourcePath: pickedFile!.path,
+//                  aspectRatioPresets: [
+//                    CropAspectRatioPreset.square,CropAspectRatioPreset.ratio3x2,CropAspectRatioPreset.original, CropAspectRatioPreset.ratio4x3,CropAspectRatioPreset.ratio16x9],
+                    uiSettings:[ IOSUiSettings(title:'Crop Image')],
+                  ));
+
+//    item.picture = pickedFile?.path as String;
+    item.picture = croppedFile?.path as String;
+    Item.update(item);
+  }
+
+  Future getImage_o(
+    ImageSource img,
+    Item item,
+  ) async {
+    final XFile? pickedFile = await picker.pickImage(source: img);
     item.picture = pickedFile?.path as String;
+    Item.update(item);
   }
 
   Future<void> sendEmailC(Item item) async {
@@ -88,6 +109,7 @@ class ItemDetailsState extends State<ItemDetails> {
         phone: '5626503865', text: item.notes, filePath: [item.picture]);
   }
 */
+
   Future sendEmail(
     Item item,
   ) async {
@@ -100,12 +122,15 @@ class ItemDetailsState extends State<ItemDetails> {
     Attachment a = FileAttachment(pic);
     a.cid = "<guest@photo>";
     a.location = Location.inline;
+    String notes=item.notes;
+    notes=notes.replaceAll('\r','');
+    notes=notes.replaceAll('\n', '<br>');
     String html = "<html><body>";
     html +=
         '<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta></head>';
-    html += '<table style="width:75%;margin:auto;">';
+    html += '<table style="width:80%;margin:auto;">';
 //    html += '<tr><td><h1>Thank You</h1></td></tr>';
-    html += '<tr><td><p>${item.notes}</p></td></tr>';
+    html += '<tr><td><p>$notes</p></td></tr>';
     html += '<tr><td><img width="100%" src="cid:guest@photo"></td></tr>';
     html += "</table>";
     html += '</body></html>';
@@ -131,9 +156,17 @@ class ItemDetailsState extends State<ItemDetails> {
       }
     }
   }
-  
-  TextEditingController notesController=TextEditingController(text:"");
+  Future sendMsg(Item item,) async {
+    List<String> r=[];
+    r.add(item.phone);
+    SmsMms.send(recipients:r,filePath:item.picture,message: item.notes);
+  }
+
   Future<String> genNote() async {
+    var prompt='${item.name} came to Krish third birthday party.';
+    if(item.gift != '')prompt="${prompt}He/She brought gift of ${item.gift}.";
+    prompt='${prompt}Write a thank you note for coming to the party and the gift.';
+
     final response = await http.post(
         Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'),
         // NB: you don't need to fill headers field
@@ -145,7 +178,7 @@ class ItemDetailsState extends State<ItemDetails> {
           'contents': [
             {
               'parts': [
-                {"text": "Write a brief thank you note for my friend Mohan who came to may Krish's third birthday party. Also add appreceation for the gift of a train toy he gave"}
+                {"text": prompt}
               ]
             }
           ]
@@ -162,8 +195,10 @@ class ItemDetailsState extends State<ItemDetails> {
 }
   @override
   Widget build(BuildContext context) {
+  TextEditingController notesController=TextEditingController(text:item.notes);
     final Widget content = Form(
         key: Key(item.name),
+        child:SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -216,6 +251,16 @@ class ItemDetailsState extends State<ItemDetails> {
               },
             ),
             TextFormField(
+              initialValue: item.gift,
+              onChanged: (text) => {item.gift = text},
+              decoration: const InputDecoration(
+                  labelText: 'Gift',
+                  errorStyle: TextStyle(fontSize: 10.0),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                      borderRadius: BorderRadius.all(Radius.circular(9.0)))),
+            ),
+            TextFormField(
               controller: notesController,
               initialValue: item.notes,
               maxLines: 5,
@@ -261,11 +306,12 @@ class ItemDetailsState extends State<ItemDetails> {
               ),
               alignment: Alignment.centerRight,
               onPressed: () {
-                    genNote().then((note) {notesController.text=note; setState(() {});});
+                    genNote().then((note) {notesController.text=note;item.notes=note;Item.update(item); setState(() {});});
+//                    genNote().then((note) {setState(() {item.notes=note;});});
               },
             ),
           ],
-        ));
+        )));
 
     if (isInTabletLayout) {
       return Center(child: content);
@@ -276,15 +322,41 @@ class ItemDetailsState extends State<ItemDetails> {
         title: Text(item.name),
       ),
       body: Center(child: content),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Visibility(
+            visible:item.email!='',
+            child:FloatingActionButton(
+              onPressed: () {
+                sendEmail(item).then((value) => setState(() {}));
+              },
+              child: Icon(Icons.email),
+            ),
+            ),
+            Visibility( 
+              visible:item.phone!='',
+              child:FloatingActionButton(
+              onPressed: () {sendMsg(item).then((value)=>setState((){}));},
+              child: Icon(Icons.sms),
+            ),
+            ),
+          ],
+        ),
+      )
+      /*FloatingActionButton(
         onPressed: () {
 //          sendEmailC(item).then((value) => setState(() {}));
-          sendEmail(item).then((value) => setState(() {}));
+            sendEmail(item).then((value) => setState(() {}));
+//            sendMsg(item).then((value)=>setState((){}));
 //          sendWhatsapp(item).then((value) => setState(() {}));
         },
         tooltip: 'Add a Guest',
         child: const Icon(Icons.email),
       ),
+      */
     );
   }
 }

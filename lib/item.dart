@@ -11,6 +11,8 @@ Future<String> getFilePath() async {
 class Item {
   Item({
     required this.name,
+    required this.nickName,
+    required this.gift,
     required this.email,
     required this.phone,
     required this.picture,
@@ -19,6 +21,8 @@ class Item {
   });
 
   String name;
+  String nickName;
+  String gift;
   String email;
   String phone;
   String picture;
@@ -40,6 +44,10 @@ class Item {
     writeToFile();
   }
 
+  static void update(Item item) {
+    writeToFile();
+  }
+
   static void remove(String name) {
     for (Item i in items) {
       if (i.name == name) {
@@ -56,6 +64,8 @@ class Item {
     for (var element in items) {
       Map<String, dynamic> data = {
         'name': element.name,
+        'nickName':element.nickName,
+        'gift':element.gift,
         'email': element.email,
         'phone': element.phone,
         'picture': element.picture,
@@ -76,6 +86,8 @@ class Item {
         final i = jsonDecode(element);
         items.add(Item(
             name: i['name'],
+            nickName:i['nickName'],
+            gift:i['gift'],
             email: i['email'],
             phone: i['phone'],
             picture: i['picture'],
@@ -89,6 +101,8 @@ class Item {
 final List<Item> items = <Item>[
   Item(
     name: 'Add New...',
+    nickName:'',
+    gift:'',
     email: '',
     phone: '',
     picture: '',

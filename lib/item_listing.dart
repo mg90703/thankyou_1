@@ -52,7 +52,7 @@ class ItemListingState extends State<ItemListing> {
 
 
   final TextEditingController _controller = TextEditingController();
-  Widget setupAlertDialoadContainer(context) {
+  Widget setupAlertDialogContainer(context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -95,7 +95,7 @@ class ItemListingState extends State<ItemListing> {
         ),
 */
         Container(
-            color: Colors.grey,
+            color: Colors.lightBlueAccent,
             height: 300.0, // Change as per your requirement
             width: 300.0, // Change as per your requirement
             child: StatefulBuilder(
@@ -113,6 +113,8 @@ class ItemListingState extends State<ItemListing> {
                       if (value!) {
                         item = Item(
                             name: contact.displayName,
+                            nickName:'',
+                            gift:'',
                             email: contact.emails.isEmpty
                                 ? ''
                                 : contact.emails[0].address,
@@ -218,8 +220,8 @@ class ItemListingState extends State<ItemListing> {
               builder: (context) {
                 return AlertDialog(
                   scrollable: true,
-                  title: Text('Count=${this.contacts.length}'),
-                  content: setupAlertDialoadContainer(context),
+                  title: Text('Count=${contacts.length}'),
+                  content: setupAlertDialogContainer(context),
                   actions: <Widget>[
                     TextButton(
                       child: const Text('ok'),
