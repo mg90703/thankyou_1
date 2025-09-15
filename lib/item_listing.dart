@@ -212,7 +212,53 @@ class ItemListingState extends State<ItemListing> {
           );
         }).toList(),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Visibility(
+            child:FloatingActionButton(
+              onPressed: () {
+                Item item=Item(name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+                Item.add(item);
+                itemSelectedCallback(item);
+              },
+              child: Icon(Icons.add),
+            ),
+            ),
+            Visibility(
+            child:FloatingActionButton(
+              onPressed: () {
+                getContacts().then((value) => showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return AlertDialog(
+                        scrollable: true,
+                        title: Text('Count=${contacts.length}'),
+                        content: setupAlertDialogContainer(context),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('ok'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              setState(() {});
+                            },
+                          ),
+                        ],
+                      );
+                    }
+                  ));
+              },
+              tooltip: 'Add a Guest',
+              child: const Icon(Icons.contacts),
+              )
+              )
+            ]
+        ))
+
+/*      floatingActionButton: FloatingActionButton(
         onPressed: () {
           getContacts().then((value) => showDialog(
               context: context,
@@ -235,8 +281,8 @@ class ItemListingState extends State<ItemListing> {
               }));
         },
         tooltip: 'Add a Guest',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.contacts),
       ),
-    );
+*/    );
   }
 }

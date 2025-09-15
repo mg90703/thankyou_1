@@ -99,7 +99,7 @@ class Item {
 }
 
 final List<Item> items = <Item>[
-  Item(
+/*  Item(
     name: 'Add New...',
     nickName:'',
     gift:'',
@@ -109,4 +109,5 @@ final List<Item> items = <Item>[
     notes: '',
     completed: false,
   ),
+  */
 ];
