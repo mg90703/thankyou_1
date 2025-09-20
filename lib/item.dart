@@ -10,6 +10,7 @@ Future<String> getFilePath() async {
 
 class Item {
   Item({
+    required this.id,
     required this.name,
     required this.nickName,
     required this.gift,
@@ -20,6 +21,7 @@ class Item {
     required this.completed,
   });
 
+  String id;
   String name;
   String nickName;
   String gift;
@@ -29,7 +31,14 @@ class Item {
   String notes;
   bool completed;
 
-  static bool contains(String name) {
+  static bool exists(String id) {
+    for (Item i in items) {
+      if (i.id == id) return true;
+    }
+    return false;
+  }
+
+  static bool containsName(String name) {
     for (Item i in items) {
       if (i.name == name) return true;
     }
@@ -48,9 +57,9 @@ class Item {
     writeToFile();
   }
 
-  static void remove(String name) {
+  static void remove(String id) {
     for (Item i in items) {
-      if (i.name == name) {
+      if (i.id == id) {
         items.remove(i);
         break;
       }
@@ -64,6 +73,7 @@ class Item {
     file.writeAsStringSync(''); // blank out the file
     for (var element in items) {
       Map<String, dynamic> data = {
+        'id':element.id,
         'name': element.name,
         'nickName':element.nickName,
         'gift':element.gift,
@@ -86,6 +96,7 @@ class Item {
       for (var element in lines) {
         final i = jsonDecode(element);
         items.add(Item(
+            id:i['id'],
             name: i['name'],
             nickName:i['nickName'],
             gift:i['gift'],

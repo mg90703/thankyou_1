@@ -1,7 +1,18 @@
 import 'item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:uuid/uuid.dart';
 
+  String getPhoneFromContact(Contact contact,PhoneLabel label )
+  {
+    if(contact.phones.length==1)return contact.phones[0].number;
+    for(Phone p in contact.phones)
+    {
+      if(p.label==PhoneLabel.mobile) return p.number;
+    }
+    return '';
+  }
+  var uuid=Uuid();
 class ItemListing extends StatefulWidget {
   const ItemListing({super.key, 
     required this.itemSelectedCallback,
@@ -9,7 +20,7 @@ class ItemListing extends StatefulWidget {
   });
   final ValueChanged<Item> itemSelectedCallback;
   final Item selectedItem;
-
+  
   @override
   State<ItemListing> createState() => ItemListingState(
       itemSelectedCallback: itemSelectedCallback, selectedItem: selectedItem);
@@ -107,26 +118,27 @@ class ItemListingState extends State<ItemListing> {
                   _ss = setState;
                   return CheckboxListTile(
                     title: Text(contact.displayName),
-                    value: Item.contains(contact.displayName),
+                    subtitle: Text(getPhoneFromContact(contact, PhoneLabel.mobile)),
+                    value: Item.exists(contact.id),
+                    side:BorderSide(color: (Item.containsName(contact.displayName) && !Item.exists(contact.id))?Colors.red:Colors.black, width: 2.0), 
                     onChanged: (bool? value) {
                       Item item;
                       if (value!) {
                         item = Item(
-                            name: contact.displayName,
-                            nickName:'',
-                            gift:'',
-                            email: contact.emails.isEmpty
-                                ? ''
-                                : contact.emails[0].address,
-                            phone: contact.phones.isEmpty
-                                ? ''
-                                : contact.phones[0].number,
-                            picture: '',
-                            notes: '',
-                            completed: false);
+                          id:contact.id,
+                          name: contact.displayName,
+                          nickName:'',
+                          gift:'',
+                          email: contact.emails.isEmpty
+                              ? ''
+                              : contact.emails[0].address,
+                          phone: getPhoneFromContact(contact, PhoneLabel.mobile),
+                          picture: '',
+                          notes: '',
+                          completed: false);
                         Item.add(item);
                       } else {
-                        Item.remove(contact.displayName);
+                        Item.remove(contact.id);
                       }
                       setState(() {}); // for the dialog's checkbox
                       setState(() {}); // for the main list
@@ -156,7 +168,7 @@ class ItemListingState extends State<ItemListing> {
                 child: Text(item.name),
               ),
               IconButton(
-                iconSize: 30,
+                iconSize: 20,
                 icon: (item.notes == '')
                     ? const Icon(
                         Icons.note,
@@ -170,7 +182,7 @@ class ItemListingState extends State<ItemListing> {
                 onPressed: () {},
               ),
               IconButton(
-                iconSize: 30,
+                iconSize: 20,
                 icon: (item.picture == '')
                     ? const Icon(
                         Icons.image,
@@ -184,29 +196,29 @@ class ItemListingState extends State<ItemListing> {
                 onPressed: () {},
               ),
               IconButton(
-                iconSize: 30,
-                icon: (item.email == '')
+                iconSize: 20,
+                icon: (item.email == '' && item.phone=='')
                     ? const Icon(
-                        Icons.email_outlined,
+                        Icons.send_outlined,
                         color: Colors.grey,
                       )
                     : item.completed
                         ? Icon(
-                            Icons.email,
+                            Icons.send,
                             color: Colors.blue,
                           )
                         : Icon(
-                            Icons.email_outlined,
+                            Icons.send_outlined,
                             color: Colors.blue,
                           ),
                 alignment: Alignment.centerRight,
                 onPressed: () {},
               ),
               IconButton(
-                iconSize: 30,
+                iconSize: 20,
                 icon: const Icon(Icons.delete,),
                 alignment: Alignment.centerRight,
-                onPressed: () {Item.remove(item.name);setState(() {});},
+                onPressed: () {Item.remove(item.id);setState(() {});},
               ),
             ])),
             onTap: () {
@@ -226,7 +238,7 @@ class ItemListingState extends State<ItemListing> {
             Visibility(
             child:FloatingActionButton(
               onPressed: () {
-                Item item=Item(name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+                Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
                 Item.add(item);
                 itemSelectedCallback(item);
               },

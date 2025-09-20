@@ -160,6 +160,8 @@ class ItemDetailsState extends State<ItemDetails> {
     List<String> r=[];
     r.add(item.phone);
     SmsMms.send(recipients:r,filePath:item.picture,message: item.notes);
+    item.completed = true;
+
   }
 
   Future<String> genNote() async {

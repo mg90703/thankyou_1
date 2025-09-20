@@ -14,7 +14,7 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
   static const int kTabletBreakpoint = 600;
 
   Item _selectedItem = Item(
-      name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+      id:"",name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
 
   Widget _buildMobileLayout() {
     return ItemListing(
