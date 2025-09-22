@@ -208,11 +208,10 @@ class ItemDetailsState extends State<ItemDetails> {
               initialValue: item.name,
               onChanged: (text) => {item.name = text},
               decoration: const InputDecoration(
-                  labelText: 'Name',
-                  errorStyle: TextStyle(fontSize: 10.0),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)))),
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Name',
+                errorStyle: TextStyle(fontSize: 10.0),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter name';
@@ -224,11 +223,10 @@ class ItemDetailsState extends State<ItemDetails> {
               initialValue: item.email,
               onChanged: (text) => {item.email = text},
               decoration: const InputDecoration(
-                  labelText: 'E-mail',
+                  hintText: 'E-mail',
+                  prefixIcon: Icon(Icons.email),
                   errorStyle: TextStyle(fontSize: 10.0),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)))),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter email';
@@ -240,11 +238,10 @@ class ItemDetailsState extends State<ItemDetails> {
               initialValue: item.phone,
               onChanged: (text) => {item.phone = text},
               decoration: const InputDecoration(
-                  labelText: 'Phone',
+                  hintText: 'Mobile Phone',
+                  prefixIcon: Icon(Icons.phone_iphone),
                   errorStyle: TextStyle(fontSize: 10.0),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)))),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter phone';
@@ -256,11 +253,10 @@ class ItemDetailsState extends State<ItemDetails> {
               initialValue: item.gift,
               onChanged: (text) => {item.gift = text},
               decoration: const InputDecoration(
-                  labelText: 'Gift',
+                  hintText: 'Gift',
                   errorStyle: TextStyle(fontSize: 10.0),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)))),
+                  prefixIcon: Icon(Icons.card_giftcard),
+              ),
             ),
             TextFormField(
               controller: notesController,
@@ -271,9 +267,7 @@ class ItemDetailsState extends State<ItemDetails> {
               decoration: const InputDecoration(
                   labelText: 'Note',
                   errorStyle: TextStyle(fontSize: 10.0),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)))),
+                ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter phone';

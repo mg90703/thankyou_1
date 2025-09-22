@@ -82,29 +82,6 @@ class ItemListingState extends State<ItemListing> {
           ),
         ),
 
-/*        new Container(
-          color: Theme.of(context).primaryColor,
-          child: new Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: new Card(
-              child: new ListTile(
-                leading: new Icon(Icons.search),
-                title: new TextField(
-                  decoration: new InputDecoration(
-                      hintText: 'Search', border: InputBorder.none),
-                  onChanged: onSearchTextChanged,
-                ),
-                trailing: new IconButton(
-                  icon: new Icon(Icons.cancel),
-                  onPressed: () {
-                    onSearchTextChanged('');
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
-*/
         Container(
             color: Colors.lightBlueAccent,
             height: 300.0, // Change as per your requirement
@@ -162,6 +139,82 @@ class ItemListingState extends State<ItemListing> {
       body: ListView(
         children: items.map((item) {
           return ListTile(
+            onTap: () {
+              itemSelectedCallback(item);
+            },
+            selected: selectedItem == item,
+            selectedColor: Colors.amber,
+            selectedTileColor: Colors.blue,
+            title: Card(
+              margin:const EdgeInsets.all(8.0),
+              shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              elevation:8,
+              shadowColor: Colors.blue,
+              child: Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment: CrossAxisAlignment.start, 
+              children:<Widget>[
+                ListTile(
+//                  leading:const Icon(Icons.person),
+                  title:Text(item.name),
+                  subtitle:Text(item.phone),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                  IconButton(
+                    iconSize: 20,
+                    icon: (item.notes == '')
+                        ? const Icon(
+                            Icons.note,
+                            color: Colors.grey,
+                          )
+                        : const Icon(
+                            Icons.note,
+                            color: Colors.blue,
+                          ),
+                    alignment: Alignment.centerRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 20,
+                    icon: (item.picture == '')
+                        ? const Icon(
+                            Icons.image,
+                            color: Colors.grey,
+                          )
+                        : const Icon(
+                            Icons.image,
+                            color: Colors.blue,
+                          ),
+                    alignment: Alignment.centerRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 20,
+                    icon: (item.email == '' && item.phone=='')
+                        ? const Icon(
+                            Icons.send_outlined,
+                            color: Colors.grey,
+                          )
+                        : item.completed
+                            ? Icon(
+                                Icons.send,
+                                color: Colors.blue,
+                              )
+                            : Icon(
+                                Icons.send_outlined,
+                                color: Colors.blue,
+                              ),
+                    alignment: Alignment.centerRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 20,
+                    icon: const Icon(Icons.delete,),
+                    alignment: Alignment.centerRight,
+                    onPressed: () {Item.remove(item.id);setState(() {});},
+                  ),
+              ]),
+/*
             title: Card(
                 child: Row(children: <Widget>[
               Expanded(
@@ -221,12 +274,8 @@ class ItemListingState extends State<ItemListing> {
                 onPressed: () {Item.remove(item.id);setState(() {});},
               ),
             ])),
-            onTap: () {
-              itemSelectedCallback(item);
-            },
-            selected: selectedItem == item,
-            selectedColor: Colors.amber,
-            selectedTileColor: Colors.blue,
+*/  
+          ]))
           );
         }).toList(),
       ),
