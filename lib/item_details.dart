@@ -1,3 +1,5 @@
+import 'package:path_provider/path_provider.dart';
+
 import 'item.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,6 +16,7 @@ const GEMINI_API_KEY="AIzaSyAR422QbUHwHJrNThsfT2bGvdRCBUvK4pY";
 
 //import 'package:whatsapp_share/whatsapp_share.dart';
 //import 'package:share_plus/share_plus.dart';
+// Get the application documents directory
 
 class ItemDetails extends StatefulWidget {
   const ItemDetails({super.key, 
@@ -39,7 +42,7 @@ class ItemDetailsState extends State<ItemDetails> {
 
   final picker = ImagePicker();
 
-  Future getImage(
+  Future<String> getImage(
     ImageSource img,
     Item item,
   ) async {
@@ -52,17 +55,14 @@ class ItemDetailsState extends State<ItemDetails> {
                   ));
 
 //    item.picture = pickedFile?.path as String;
-    item.picture = croppedFile?.path as String;
-    Item.update(item);
-  }
-
-  Future getImage_o(
-    ImageSource img,
-    Item item,
-  ) async {
-    final XFile? pickedFile = await picker.pickImage(source: img);
-    item.picture = pickedFile?.path as String;
-    Item.update(item);
+    File sourceFile=File(croppedFile!.path);
+    String newFile=item.getImgFilePath();
+    await sourceFile.rename(newFile);
+    item.picture = newFile;//croppedFile?.path as String;
+    Item.update(item);//
+    imageCache.clear();
+    imageCache.clearLiveImages();
+    return newFile;
   }
 
   Future<void> sendEmailC(Item item) async {
@@ -159,7 +159,7 @@ class ItemDetailsState extends State<ItemDetails> {
   Future sendMsg(Item item,) async {
     List<String> r=[];
     r.add(item.phone);
-    SmsMms.send(recipients:r,filePath:item.picture,message: item.notes);
+    SmsMms.send(recipients:r,filePath:item.getImgFilePath(),message: item.notes);
     item.completed = true;
 
   }
@@ -167,7 +167,7 @@ class ItemDetailsState extends State<ItemDetails> {
   Future<String> genNote() async {
     var prompt='${item.name} came to Krish third birthday party.';
     if(item.gift != '')prompt="${prompt}He/She brought gift of ${item.gift}.";
-    prompt='${prompt}Write a thank you note for coming to the party and the gift.';
+    prompt='${prompt}Write a thank you note for coming to the party' + ((item.gift != '')?' and the gift.':'.');
 
     final response = await http.post(
         Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'),
@@ -276,7 +276,8 @@ class ItemDetailsState extends State<ItemDetails> {
               },
             ),
             Image.file(
-              File(item.picture),
+              File(item.getImgFilePath()),
+              key:UniqueKey(),
               width: 200.0,
               height: 200.0,
               fit: BoxFit.fitHeight,

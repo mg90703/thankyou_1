@@ -61,7 +61,6 @@ class ItemListingState extends State<ItemListing> {
     _ss(() {});
   }
 
-
   final TextEditingController _controller = TextEditingController();
   Widget setupAlertDialogContainer(context) {
     return Column(
@@ -130,6 +129,172 @@ class ItemListingState extends State<ItemListing> {
 
   @override
   Widget build(BuildContext context) {
+      return Scaffold(
+        body:
+      GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: (MediaQuery.of(context).size.width/250).toInt(), // columns
+          crossAxisSpacing: 4.0, // Spacing between columns
+          mainAxisSpacing: 4.0,
+          mainAxisExtent: 120,
+//          childAspectRatio: 1.0, // Aspect ratio of each tile
+        ),
+        itemCount: items.length, // Total number of tiles
+        itemBuilder: (BuildContext context, int index) {
+          var item=items[index];
+          return GridTile(
+            
+//            header: GridTileBar(
+//              backgroundColor: Colors.black45,
+//              title: Text('Tile Header ${index + 1}'),
+//            ),
+//            footer: GridTileBar(
+//              backgroundColor: Colors.black45,
+//              title: Text('Tile Footer ${index + 1}'),
+//            ),
+            child: GestureDetector(
+              onTap: () {
+                itemSelectedCallback(item);
+              },
+              child: Card(
+              margin:const EdgeInsets.all(8.0),
+              shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              elevation:8,
+              shadowColor: Colors.blue,
+              child: Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment: CrossAxisAlignment.start, 
+              children:<Widget>[
+                ListTile(
+//                  leading:const Icon(Icons.person),
+                  minTileHeight: 1,
+                  title:Text(item.name),
+                  subtitle:Text(item.phone),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                  IconButton(
+                    iconSize: 15,
+                    icon: (item.notes == '')
+                        ? const Icon(
+                            Icons.note,
+                            color: Colors.grey,
+                          )
+                        : const Icon(
+                            Icons.note,
+                            color: Colors.blue,
+                          ),
+                    alignment: Alignment.topRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 15,
+                    icon: (item.picture == '')
+                        ? const Icon(
+                            Icons.image,
+                            color: Colors.grey,
+                          )
+                        : const Icon(
+                            Icons.image,
+                            color: Colors.blue,
+                          ),
+                    alignment: Alignment.topRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 15,
+                    icon: (item.gift == '')
+                        ? const Icon(
+                            Icons.card_giftcard,
+                            color: Colors.grey,
+                          )
+                        : const Icon(
+                            Icons.card_giftcard,
+                            color: Colors.blue,
+                          ),
+                    alignment: Alignment.topRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 15,
+                    icon: (item.email == '' && item.phone=='')
+                        ? const Icon(
+                            Icons.send_outlined,
+                            color: Colors.grey,
+                          )
+                        : item.completed
+                            ? Icon(
+                                Icons.send,
+                                color: Colors.blue,
+                              )
+                            : Icon(
+                                Icons.send_outlined,
+                                color: Colors.blue,
+                              ),
+                    alignment: Alignment.topRight,
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    iconSize: 15,
+                    icon: const Icon(Icons.delete,color:Colors.red),
+                    alignment: Alignment.topRight,
+                    onPressed: () {Item.remove(item.id);setState(() {});},
+                  ),
+              ]),  
+          ])),
+          ),
+         );
+        },
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Visibility(
+            child:FloatingActionButton(
+              onPressed: () {
+                Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+                Item.add(item);
+                itemSelectedCallback(item);
+              },
+              child: Icon(Icons.add),
+            ),
+            ),
+            Visibility(
+            child:FloatingActionButton(
+              onPressed: () {
+                getContacts().then((value) => showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return AlertDialog(
+                        scrollable: true,
+                        title: Text('Count=${contacts.length}'),
+                        content: setupAlertDialogContainer(context),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('ok'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              setState(() {});
+                            },
+                          ),
+                        ],
+                      );
+                    }
+                  ));
+              },
+              tooltip: 'Add a Guest',
+              child: const Icon(Icons.contacts),
+              )
+              )
+            ]
+        ))
+      );
+    }
+
+  @override
+  Widget build_x(BuildContext context) {
     return Scaffold(
 /*      appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -213,68 +378,7 @@ class ItemListingState extends State<ItemListing> {
                     alignment: Alignment.centerRight,
                     onPressed: () {Item.remove(item.id);setState(() {});},
                   ),
-              ]),
-/*
-            title: Card(
-                child: Row(children: <Widget>[
-              Expanded(
-                child: Text(item.name),
-              ),
-              IconButton(
-                iconSize: 20,
-                icon: (item.notes == '')
-                    ? const Icon(
-                        Icons.note,
-                        color: Colors.grey,
-                      )
-                    : const Icon(
-                        Icons.note,
-                        color: Colors.blue,
-                      ),
-                alignment: Alignment.centerRight,
-                onPressed: () {},
-              ),
-              IconButton(
-                iconSize: 20,
-                icon: (item.picture == '')
-                    ? const Icon(
-                        Icons.image,
-                        color: Colors.grey,
-                      )
-                    : const Icon(
-                        Icons.image,
-                        color: Colors.blue,
-                      ),
-                alignment: Alignment.centerRight,
-                onPressed: () {},
-              ),
-              IconButton(
-                iconSize: 20,
-                icon: (item.email == '' && item.phone=='')
-                    ? const Icon(
-                        Icons.send_outlined,
-                        color: Colors.grey,
-                      )
-                    : item.completed
-                        ? Icon(
-                            Icons.send,
-                            color: Colors.blue,
-                          )
-                        : Icon(
-                            Icons.send_outlined,
-                            color: Colors.blue,
-                          ),
-                alignment: Alignment.centerRight,
-                onPressed: () {},
-              ),
-              IconButton(
-                iconSize: 20,
-                icon: const Icon(Icons.delete,),
-                alignment: Alignment.centerRight,
-                onPressed: () {Item.remove(item.id);setState(() {});},
-              ),
-            ])),
-*/  
+              ]),  
           ]))
           );
         }).toList(),

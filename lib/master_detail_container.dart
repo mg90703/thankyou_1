@@ -11,7 +11,7 @@ class MasterDetailContainer extends StatefulWidget {
 }
 
 class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
-  static const int kTabletBreakpoint = 600;
+//  static const int kTabletBreakpoint = 600;
 
   Item _selectedItem = Item(
       id:"",name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
@@ -32,6 +32,7 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
             },
           ),
         ).then((_) {
+          Item.update(item);
           setState(() {});
         });
       },
@@ -72,11 +73,11 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
     Widget settingsPage;
     var shortestSide = MediaQuery.of(context).size.shortestSide;
 
-    if (shortestSide < kTabletBreakpoint) {
+//    if (shortestSide < kTabletBreakpoint) {
       content = _buildMobileLayout();
-    } else {
-      content = _buildTabletLayout();
-    }
+//    } else {
+//      content = _buildTabletLayout();
+//    }
     settingsPage = SettingsList(
       sections: [
         SettingsSection(

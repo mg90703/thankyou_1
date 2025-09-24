@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 // Get the application documents directory
 Future<String> getFilePath() async {
   Directory directory = await getApplicationDocumentsDirectory();
+  Item.appDirectoryPath=directory.path;
   return File('${directory.path}/my_file.txt').path;
 }
 
@@ -31,6 +32,11 @@ class Item {
   String notes;
   bool completed;
 
+  static String appDirectoryPath='';
+  String getImgFilePath() {
+    return '${Item.appDirectoryPath}/${id}.jpg';
+}
+
   static bool exists(String id) {
     for (Item i in items) {
       if (i.id == id) return true;
@@ -54,7 +60,7 @@ class Item {
   }
 
   static void update(Item item) {
-    writeToFile();
+    writeToFile().then((v){});
   }
 
   static void remove(String id) {
