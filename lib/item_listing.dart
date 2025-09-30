@@ -34,14 +34,17 @@ class ItemListingState extends State<ItemListing> {
   @override
   initState() async {
     await Item.readFromFile().then((value) => setState(() {}));
+    selectItems();
     super.initState();
   }
 
   bool showContacts = false;
   late List<Contact> contacts;
   late List<Contact> _filteredContacts;
+  static late List<Item> _selectedItems=<Item>[];
   final ValueChanged<Item> itemSelectedCallback;
   final Item selectedItem;
+  static String listSelection='All';
   late void Function(void Function()) _ss;
   Future getContacts() async {
 //    if (await FlutterContacts.requestPermission(readonly: true)) {
@@ -111,11 +114,13 @@ class ItemListingState extends State<ItemListing> {
                           phone: getPhoneFromContact(contact, PhoneLabel.mobile),
                           picture: '',
                           notes: '',
+                          sent:false,
                           completed: false);
                         Item.add(item);
                       } else {
                         Item.remove(contact.id);
                       }
+                      selectItems();
                       setState(() {}); // for the dialog's checkbox
                       setState(() {}); // for the main list
                     },
@@ -139,9 +144,9 @@ class ItemListingState extends State<ItemListing> {
           mainAxisExtent: 120,
 //          childAspectRatio: 1.0, // Aspect ratio of each tile
         ),
-        itemCount: items.length, // Total number of tiles
+        itemCount: _selectedItems.length, // Total number of tiles
         itemBuilder: (BuildContext context, int index) {
-          var item=items[index];
+          var item=_selectedItems[index];
           return GridTile(
             
 //            header: GridTileBar(
@@ -216,28 +221,19 @@ class ItemListingState extends State<ItemListing> {
                   ),
                   IconButton(
                     iconSize: 15,
-                    icon: (item.email == '' && item.phone=='')
-                        ? const Icon(
-                            Icons.send_outlined,
-                            color: Colors.grey,
-                          )
-                        : item.completed
-                            ? Icon(
-                                Icons.send,
-                                color: Colors.blue,
-                              )
-                            : Icon(
-                                Icons.send_outlined,
-                                color: Colors.blue,
-                              ),
-                    alignment: Alignment.topRight,
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    iconSize: 15,
                     icon: const Icon(Icons.delete,color:Colors.red),
                     alignment: Alignment.topRight,
-                    onPressed: () {Item.remove(item.id);setState(() {});},
+                    onPressed: () {Item.remove(item.id);selectItems(); setState(() {});},
+                  ),
+                  Visibility(
+                  visible:item.completed,
+                  child:
+                        IconButton(
+                          iconSize: 20,
+                          icon: Icon(Icons.check,color: Colors.red,),
+                          alignment: Alignment.topRight,
+                          onPressed: () {},
+                        ),
                   ),
               ]),  
           ])),
@@ -253,7 +249,7 @@ class ItemListingState extends State<ItemListing> {
             Visibility(
             child:FloatingActionButton(
               onPressed: () {
-                Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+                Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '',sent:false, completed: false);
                 Item.add(item);
                 itemSelectedCallback(item);
               },
@@ -391,8 +387,9 @@ class ItemListingState extends State<ItemListing> {
             Visibility(
             child:FloatingActionButton(
               onPressed: () {
-                Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+                Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', sent:false, completed: false);
                 Item.add(item);
+                selectItems();
                 itemSelectedCallback(item);
               },
               child: Icon(Icons.add),
@@ -456,4 +453,19 @@ class ItemListingState extends State<ItemListing> {
       ),
 */    );
   }
+
+  static void selectItems() 
+  {      
+    _selectedItems=<Item>[];
+    for(Item i in items)
+      {
+          if(listSelection=='Done')
+          {
+            if(i.completed)_selectedItems.add(i);
+          } else if(listSelection=='ToDo')
+          {
+            if(!i.completed)_selectedItems.add(i);
+          } else _selectedItems.add(i);
+      }
+}
 }

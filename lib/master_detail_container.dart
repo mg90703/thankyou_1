@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
 class MasterDetailContainer extends StatefulWidget {
+  const MasterDetailContainer({super.key});
+
   @override
   _ItemMasterDetailContainerState createState() =>
       _ItemMasterDetailContainerState();
@@ -14,7 +16,7 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
 //  static const int kTabletBreakpoint = 600;
 
   Item _selectedItem = Item(
-      id:"",name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '', completed: false);
+      id:"",name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '',sent:false, completed: false);
 
   Widget _buildMobileLayout() {
     return ItemListing(
@@ -71,7 +73,6 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
   Widget build(BuildContext context) {
     Widget content;
     Widget settingsPage;
-    var shortestSide = MediaQuery.of(context).size.shortestSide;
 
 //    if (shortestSide < kTabletBreakpoint) {
       content = _buildMobileLayout();
@@ -102,6 +103,22 @@ class _ItemMasterDetailContainerState extends State<MasterDetailContainer> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Guest List'),
+        actions: [
+          DropdownButton<String>(
+            value:ItemListingState.listSelection,
+            items: [
+              DropdownMenuItem(child: Text("All"),value: "All"),
+              DropdownMenuItem(child: Text("Done"),value: "Done"),
+              DropdownMenuItem(child: Text("ToDo"),value: "ToDo"),
+            ],
+          onChanged:(String? newValue)
+          {
+            ItemListingState.listSelection=newValue??'All';
+            setState(() {
+            ItemListingState.selectItems();
+          });
+        },)
+        ],
       ),
       drawer: settingsPage,
       body: content,

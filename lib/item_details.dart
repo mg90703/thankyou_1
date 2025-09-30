@@ -160,14 +160,13 @@ class ItemDetailsState extends State<ItemDetails> {
     List<String> r=[];
     r.add(item.phone);
     SmsMms.send(recipients:r,filePath:item.getImgFilePath(),message: item.notes);
-    item.completed = true;
-
+    item.sent = true;
   }
 
   Future<String> genNote() async {
     var prompt='${item.name} came to Krish third birthday party.';
     if(item.gift != '')prompt="${prompt}He/She brought gift of ${item.gift}.";
-    prompt='${prompt}Write a thank you note for coming to the party' + ((item.gift != '')?' and the gift.':'.');
+    prompt='${prompt}Write a short friendly text message thanking for coming to the party${(item.gift != '')?' and the gift.':'.'}';
 
     final response = await http.post(
         Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'),
@@ -258,6 +257,12 @@ class ItemDetailsState extends State<ItemDetails> {
                   prefixIcon: Icon(Icons.card_giftcard),
               ),
             ),
+            InkWell(
+              onTap: () {
+              genNote().then((note) {notesController.text=note;item.notes=note;Item.update(item); setState(() {});});
+              },
+              child:Text('Generate Note'),
+            ),              
             TextFormField(
               controller: notesController,
               initialValue: item.notes,
@@ -282,33 +287,17 @@ class ItemDetailsState extends State<ItemDetails> {
               height: 200.0,
               fit: BoxFit.fitHeight,
             ),
-            IconButton(
-              iconSize: 30,
-              icon: const Icon(
-                Icons.image,
-                color: Colors.blue,
-              ),
-              alignment: Alignment.centerRight,
-              onPressed: () {
-                //onDeleteGuest(guest);
-                getImage(ImageSource.gallery, item)
-                    .then((value) => setState(() {}));
-              },
-            ),
-            IconButton(
-              iconSize: 30,
-              icon: const Icon(
-                Icons.note_add,
-                color: Colors.blue,
-              ),
-              alignment: Alignment.centerRight,
-              onPressed: () {
-                    genNote().then((note) {notesController.text=note;item.notes=note;Item.update(item); setState(() {});});
-//                    genNote().then((note) {setState(() {item.notes=note;});});
-              },
+            InkWell(
+              onTap: () {
+              getImage(ImageSource.gallery, item)
+                .then((value) => setState(() {}));
+                },
+              child:Text('Pick Image'),
             ),
           ],
-        )));
+        )
+      )
+    );
 
     if (isInTabletLayout) {
       return Center(child: content);
@@ -317,9 +306,52 @@ class ItemDetailsState extends State<ItemDetails> {
     return Scaffold(
       appBar: AppBar(
         title: Text(item.name),
+        actions:[
+              Checkbox(
+                value: item.completed,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    item.completed = newValue ?? false; // Update state when checkbox is toggled
+                  });
+                },
+              ),
+              IconButton(
+                iconSize: 30,
+                icon: (item.phone=='') // && item.email == '')
+                    ? const Icon(
+                        Icons.send_outlined,
+                        color: Colors.grey,
+                      )
+                    : item.completed
+                        ? Icon(
+                            Icons.send,
+                            color: Colors.blue,
+                          )
+                        : Icon(
+                            Icons.send_outlined,
+                            color: Colors.blue,
+                          ),
+                alignment: Alignment.centerRight,
+                onPressed: () {
+                  sendMsg(item).then((value)=>setState((){}));
+                },
+              ),
+/*              IconButton(
+                iconSize: 30,
+                icon: const Icon(
+                  Icons.note_add,
+                  color: Colors.blue,
+                ),
+                alignment: Alignment.centerRight,
+                onPressed: () {
+                      genNote().then((note) {notesController.text=note;item.notes=note;Item.update(item); setState(() {});});
+  //                    genNote().then((note) {setState(() {item.notes=note;});});
+                },
+              ),
+  */      ],
       ),
-      body: Center(child: content),
-      floatingActionButton: Padding(
+      body: content,
+/*      floatingActionButton: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -343,17 +375,7 @@ class ItemDetailsState extends State<ItemDetails> {
           ],
         ),
       )
-      /*FloatingActionButton(
-        onPressed: () {
-//          sendEmailC(item).then((value) => setState(() {}));
-            sendEmail(item).then((value) => setState(() {}));
-//            sendMsg(item).then((value)=>setState((){}));
-//          sendWhatsapp(item).then((value) => setState(() {}));
-        },
-        tooltip: 'Add a Guest',
-        child: const Icon(Icons.email),
-      ),
-      */
+*/
     );
   }
 }

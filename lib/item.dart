@@ -20,6 +20,7 @@ class Item {
     required this.phone,
     required this.picture,
     required this.notes,
+    required this.sent,
     required this.completed,
   });
 
@@ -31,6 +32,7 @@ class Item {
   String phone;
   String picture;
   String notes;
+  bool sent;
   bool completed;
 
   static String appDirectoryPath='';
@@ -112,6 +114,7 @@ class Item {
             phone: i['phone'],
             picture: i['picture'],
             notes: i['notes'],
+            sent:i['sent']??false,
             completed: i['completed']));
       }
     }
