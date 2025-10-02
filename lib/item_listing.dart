@@ -251,6 +251,7 @@ class ItemListingState extends State<ItemListing> {
               onPressed: () {
                 Item item=Item(id:uuid.v4(),name: "", nickName:'',gift:'',email: '', phone: '', picture: '', notes: '',sent:false, completed: false);
                 Item.add(item);
+                selectItems();
                 itemSelectedCallback(item);
               },
               child: Icon(Icons.add),
